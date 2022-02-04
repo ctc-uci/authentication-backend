@@ -24,7 +24,7 @@ userRouter.get('/:email', async (req, res) => {
   try {
     const user = await pool.query(`SELECT * FROM users WHERE email = '${email}'`);
     res.send({
-      account: user.rows[0],
+      user: user.rows[0],
     });
   } catch (err) {
     res.status(400).send(err.message);
