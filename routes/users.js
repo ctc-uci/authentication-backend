@@ -24,7 +24,7 @@ userRouter.get('/', async (req, res) => {
   }
 });
 
-// Get a specific user by email
+// Get a specific user by ID
 userRouter.get('/:userId', async (req, res) => {
   try {
     const {userId} = req.params;
