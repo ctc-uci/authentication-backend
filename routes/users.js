@@ -6,6 +6,12 @@ const pool = require('../config');
 
 userRouter.use(express.json());
 
+const isAlphaNumeric = (value) => {
+  if (!/^[0-9a-zA-Z]+$/.test(value)) {
+    throw new Error('User ID must be alphanumeric');
+  }
+};
+
 // Get all users
 userRouter.get('/', async (req, res) => {
   try {
@@ -19,10 +25,12 @@ userRouter.get('/', async (req, res) => {
 });
 
 // Get a specific user by email
-userRouter.get('/:email', async (req, res) => {
-  const {email} = req.params;
+userRouter.get('/:userId', async (req, res) => {
   try {
-    const user = await pool.query(`SELECT * FROM users WHERE email = '${email}'`);
+    const {userId} = req.params;
+    isAlphaNumeric(userId); // ID must be alphanumeric
+
+    const user = await pool.query('SELECT * FROM users WHERE user_id = $1', [userId]);
     res.send({
       user: user.rows[0],
     });
@@ -35,12 +43,12 @@ userRouter.get('/:email', async (req, res) => {
 userRouter.post('/create', async (req, res) => {
   try {
     const {email, userId, role} = req.body;
+    isAlphaNumeric(userId); // ID must be alphanumeric
 
-    const newUser = await pool.query(`
-    INSERT INTO users (email, user_id, role)
-    VALUES ('${email}', '${userId}', '${role}')
-    RETURNING *
-  `);
+    const newUser = await pool.query(
+      'INSERT INTO users (email, user_id, role) VALUES ($1, $2, $3) RETURNING *',
+      [email, userId, role],
+    );
 
     res.status(200).send({
       newUser: newUser.rows[0],
