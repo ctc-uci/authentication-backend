@@ -42,12 +42,12 @@ userRouter.get('/:userId', async (req, res) => {
 // Add user to database
 userRouter.post('/create', async (req, res) => {
   try {
-    const {email, userId, role} = req.body;
+    const {email, userId, role, registered} = req.body;
     isAlphaNumeric(userId); // ID must be alphanumeric
 
     const newUser = await pool.query(
-      'INSERT INTO users (email, user_id, role) VALUES ($1, $2, $3) RETURNING *',
-      [email, userId, role],
+      'INSERT INTO users (email, user_id, role, registered) VALUES ($1, $2, $3, $4) RETURNING *',
+      [email, userId, role, registered],
     );
 
     res.status(200).send({
@@ -55,6 +55,23 @@ userRouter.post('/create', async (req, res) => {
     });
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+// Edit registered flag for a specific user
+userRouter.put('/update/:userId', async (req, res) => {
+  try {
+    const {userId} = req.params;
+    isAlphaNumeric(userId); // ID must be alphanumeric
+
+    const user = await pool.query('UPDATE users SET registered = true WHERE user_id = $1', [
+      userId,
+    ]);
+    res.send({
+      user: user.rows[0],
+    });
+  } catch (err) {
+    res.status(400).send(err.message);
   }
 });
 
