@@ -5,10 +5,9 @@ const admin = require('../firebase');
 
 authRouter.use(express.json());
 
+// This method makes a call to Firebase that will verify the access token attached to the request's cookies
+// This method is used to make sure that only users who have appropriate access tokens can access backend routes.
 const verifyToken = async (req, res, next) => {
-  //   console.log('@verifyToken in'}
-  //   console.log(req);
-
   try {
     const {
       cookies: {accessToken},
@@ -21,24 +20,21 @@ const verifyToken = async (req, res, next) => {
     if (!decodedToken) {
       return res.status(400).send('Empty token from firebase');
     }
-    // console.log(decodedToken);
-
     return next();
   } catch (err) {
-    console.log(err);
     return res.status(400).send('@verifyToken no access token');
   }
 };
 
+// This method makes a call to firebase that will verify the access token attached to the request's cookies
+// This method is used to make sure that only users who have appropriate access tokens can access frontend routes.
 authRouter.get('/verifyToken/:accessToken', async (req, res) => {
   try {
-    // console.log('hello');
-    // console.log(req);
     const {accessToken} = req.params;
     const decodedToken = await admin.auth().verifyIdToken(accessToken);
-    res.status(200).send(decodedToken.uid);
+    return res.status(200).send(decodedToken.uid);
   } catch (err) {
-    res.status(400).send('@verifyToken no access token');
+    return res.status(400).send('@verifyToken no access token');
   }
 });
 
