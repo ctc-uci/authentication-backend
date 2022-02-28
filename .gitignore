@@ -103,5 +103,5 @@ dist
 # TernJS port file
 .tern-port
 
-# FireBase SDK
-auth-dev-90d20-firebase-adminsdk-7k0yw-5c633a4fb2.json
+# Firebase SDK
+firebase-adminsdk.json
